@@ -277,7 +277,7 @@ class Database(Base):
 
     #### METRICS
 
-    def get_metrics(self, type=None):
+    def get_metrics(self, type=None, group=None):
         raise NotImplementedError
 
     def set_gauge(self, gauge):
@@ -287,6 +287,9 @@ class Database(Base):
         raise NotImplementedError
 
     def update_timer(self, timer):
+        raise NotImplementedError
+
+    def set_switch(self, state):
         raise NotImplementedError
 
     #### HOUSEKEEPING

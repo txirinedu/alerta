@@ -19,10 +19,8 @@ from alerta.version import __version__
 
 from . import mgmt
 
-switches = [
-    Switch('auto-refresh-allow', 'Alerta console auto-refresh', 'Allow consoles to auto-refresh alerts', SwitchState.ON),
-    Switch('sender-api-allow', 'API alert submission', 'Allow alerts to be submitted via the API', SwitchState.ON)
-]
+auto_refresh_allow_switch = Switch('auto-refresh-allow', 'Alerta console auto-refresh', 'Allow consoles to auto-refresh alerts', SwitchState.ON),
+sender_api_allow_switch = Switch('sender-api-allow', 'API alert submission', 'Allow alerts to be submitted via the API', SwitchState.ON)
 total_alert_gauge = Gauge('alerts', 'total', 'Total alerts', 'Total number of alerts in the database')
 
 started = time.time() * 1000
@@ -85,18 +83,18 @@ def switchboard():
         for switch in Switch.find_all():
             try:
                 value = request.form[switch.name]
-                switch.set_state(value)
+                switch.set(value)
             except KeyError:
                 pass
 
-        return render_template('management/switchboard.html', switches=switches)
+        return render_template('management/switchboard.html', switches=Switch.find_all())
     else:
         switch = request.args.get('switch', None)
         if switch:
             return render_template('management/switchboard.html',
-                                   switches=[Switch.get(switch)])
+                                   switches=[Switch.get(switch)])  # FIXME
         else:
-            return render_template('management/switchboard.html', switches=switches)
+            return render_template('management/switchboard.html', switches=Switch.find_all())
 
 
 @mgmt.route('/management/gtg', methods=['OPTIONS', 'GET'])

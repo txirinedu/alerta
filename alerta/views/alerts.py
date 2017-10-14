@@ -23,6 +23,8 @@ attrs_timer = Timer('alerts', 'attributes', 'Alert attributes change', 'Total ti
 delete_timer = Timer('alerts', 'deleted', 'Deleted alerts', 'Total time and number of deleted alerts')
 count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number of count queries')
 
+from alerta.management.views import auto_refresh_allow_switch
+
 
 @api.route('/alert', methods=['OPTIONS', 'POST'])
 @cross_origin()
@@ -217,7 +219,7 @@ def search_alerts():
             statusCounts=status_count,
             severityCounts=severity_count,
             lastTime=max([alert.last_receive_time for alert in alerts]),
-            autoRefresh=Switch.get('auto-refresh-allow').is_on
+            autoRefresh=auto_refresh_allow_switch.is_on
         )
     else:
         return jsonify(
@@ -232,7 +234,7 @@ def search_alerts():
             severityCounts=severity_count,
             statusCounts=status_count,
             lastTime=query_time,
-            autoRefresh=Switch.get('auto-refresh-allow').is_on
+            autoRefresh=auto_refresh_allow_switch.is_on
         )
 
 

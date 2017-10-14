@@ -923,12 +923,11 @@ class Backend(Database):
 
     #### METRICS
 
-    def get_metrics(self, type=None):
-        query = {"type": type} if type else {}
+    def get_metrics(self, type=None, group=None):
+        query = {"type": type, "group": group}
         return list(g.db.metrics.find(query, {"_id": 0}))
 
     def set_gauge(self, gauge):
-
         return g.db.metrics.find_one_and_update(
             {
                 "group": gauge.group,
@@ -949,7 +948,6 @@ class Backend(Database):
         )['value']
 
     def inc_counter(self, counter):
-
         return g.db.metrics.find_one_and_update(
             {
                 "group": counter.group,
@@ -988,6 +986,25 @@ class Backend(Database):
             upsert=True,
             return_document=ReturnDocument.AFTER
         )
+
+    def set_switch(self, state):
+        return g.db.metrics.find_one_and_update(
+            {
+                "group": state.group,
+                "name": state.name
+            },
+            {
+                '$set': {
+                    "group": state.group,
+                    "name": state.name,
+                    "title": state.title,
+                    "description": state.description,
+                    "type": "text"
+                }
+            },
+            upsert=True,
+            return_document = ReturnDocument.AFTER
+        )['value']
 
     #### HOUSEKEEPING
 

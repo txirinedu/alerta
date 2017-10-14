@@ -1,4 +1,7 @@
 
+from alerta.app import db
+
+
 class SwitchState(object):
     ON = True
     OFF = False
@@ -16,45 +19,65 @@ class Switch(object):
 
     switches = []
 
-    def __init__(self, name, title=None, description=None, state=SwitchState.ON):
-
+    def __init__(self, name, title=None, description=None, value=SwitchState.ON):
         self.group = 'switch'
         self.name = name
         self.title = title
         self.description = description
-        self.state = state
+        self.type = 'text'
+        self.value = value
 
-        Switch.switches.append(self)
+        self.set("ON")
 
     def serialize(self):
         return {
-            'group': 'switch',
             'name': self.name,
-            'type': 'text',
             'title': self.title,
             'description': self.description,
+            'type': self.type,
             'value': "ON" if self.is_on else "OFF",
         }
 
     def __repr__(self):
         return 'Switch(name=%r, description=%r, state=%r)' % (
-            self.name, self.description, SwitchState.to_string(self.state)
+            self.name, self.description, SwitchState.to_string(self.value)
         )
 
     @classmethod
-    def get(cls, name):
-        for s in Switch.switches:
-            if s.name == name:
-                return s
-        return
+    def from_document(cls, doc):
+        return Switch(
+            name=doc.get('name'),
+            title=doc.get('title', None),
+            description=doc.get('description', None),
+            value=doc.get('value', None)
+        )
+
+    @classmethod
+    def from_record(cls, rec):
+        return Switch(
+            name=rec.name,
+            title=rec.title,
+            description=rec.description,
+            value=rec.value
+        )
+
+    @classmethod
+    def from_db(cls, r):
+        if isinstance(r, dict):
+            return cls.from_document(r)
+        elif isinstance(r, tuple):
+            return cls.from_record(r)
+        else:
+            return
+
+    def set(self, state):
+        self.value = state
+        return Switch.from_db(db.set_switch(self))
 
     @classmethod
     def find_all(cls):
-        return Switch.switches
-
-    def set_state(self, state):
-        self.state = SwitchState.to_state(state)
+        return [Switch.from_db(switch) for switch in db.get_metrics(type='text', group='switch')]
 
     @property
     def is_on(self):
-        return self.state
+        return self.value

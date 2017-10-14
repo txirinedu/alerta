@@ -717,11 +717,13 @@ class Backend(Database):
 
     #### METRICS
 
-    def get_metrics(self, type=None):
+    def get_metrics(self, type=None, group=None):
         select = """SELECT * FROM metrics"""
         if type:
             select += " WHERE type=%s"
-        return self._fetchall(select, (type,))
+        if group:
+            select += " WHERE group=%s"
+        return self._fetchall(select, (type, group,))
 
     def set_gauge(self, gauge):
         upsert = """
