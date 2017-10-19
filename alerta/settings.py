@@ -20,7 +20,8 @@ DEFAULT_PAGE_SIZE = QUERY_LIMIT  # maximum number of alerts returned by a single
 HISTORY_LIMIT = 100  # cap the number of alert history entries
 
 # MongoDB
-MONGO_URI = 'mongodb://localhost:27017/monitoring'
+# MONGO_URI = 'mongodb://localhost:27017/monitoring'
+MONGO_URI = 'mongodb://alerta:alerta@ds125365.mlab.com:25365/alerta'
 MONGO_DATABASE = None  # can be used to override default database, above
 
 # PostgreSQL
@@ -31,7 +32,7 @@ DATABASE_URL = MONGO_URI  # default: MongoDB
 DATABASE_NAME = MONGO_DATABASE or POSTGRES_DB
 
 AUTH_REQUIRED = False
-ADMIN_USERS = []
+ADMIN_USERS = ['edu']
 USER_DEFAULT_SCOPES = ['read', 'write']  # Note: 'write' scope implicitly includes 'read'
 CUSTOMER_VIEWS = False
 
@@ -58,7 +59,7 @@ API_KEY_EXPIRE_DAYS = 365  # 1 year
 
 CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin']
 CORS_ORIGINS = [
-    'http://try.alerta.io',
+    'https://digitalloe-alerta.herokuapp.com',
     'http://explorer.alerta.io',
     'http://localhost'
 ]
